@@ -15,15 +15,14 @@
 #include "SetUtil.h"
 #include "FileUtil.h"
 #include "SMTApproach.h"
-#include "ScInferApproach .h"
+#include "ScInferApproach.h"
 #include "SymbolicApproach.h"
 #include "QMSApproach.h"
 
 #include <z3++.h>
 
-
+using namespace std;
 using namespace z3;
-
 
 int main(int argc, char* argv[]) {
 

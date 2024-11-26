@@ -1,33 +1,33 @@
-cmake_minimum_required(VERSION 3.5)
-project(jun_qmsInfer)
+cmake_minimum_required(VERSION 3.30)
+include(FetchContent)
+project(qmsInfer)
+
+FetchContent_Declare(z3
+        GIT_REPOSITORY https://github.com/Z3Prover/z3
+        GIT_TAG        z3-4.13.3
+)
+FetchContent_MakeAvailable(z3)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CXX_LINK_FLAGS "-lz3")
-
-
-add_definitions(${CXX_LINK_FLAGS})
-set (CMAKE_CXXFLAGS "-lz3")
-
-INCLUDE_DIRECTORIES(/usr/include)
-LINK_DIRECTORIES(/usr/bin/z3 )
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall " )
+
+include_directories(${qmsInfer_SOURCE_DIR}/include)
+include_directories(${z3_SOURCE_DIR}/src/api/c++ )
 add_executable(qmsInfer
-        "ScInferApproach .h"
-        DistributionEnums.h
-        DistributionInference.h
-        EnumUtil.h
-        FileUtil.h
-        Node.h
-        NodeTypeEnums.h
-        NodeUtil.h
-        OperatorEnums.h
-        SemanticDistributionInference.h
-        SetUtil.h
-        SMT2Parse.h
-        SMTApproach.h
-        StringUtil.h
-        SymbolicApproach.h
-        main.cpp
-        QmsStatisfy.h
-        QMSApproach.h)
-TARGET_LINK_LIBRARIES(qmsInfer z3 -lpthread)
+        src/main.cpp
+        src/ScInferApproach.cpp
+        src/DistributionInference.cpp
+        src/EnumUtil.cpp
+        src/FileUtil.cpp
+        src/Node.cpp
+        src/NodeUtil.cpp
+        src/SemanticDistributionInference.cpp
+        src/SetUtil.cpp
+        src/SMT2Parse.cpp
+        src/SMTApproach.cpp
+        src/StringUtil.cpp
+        src/SymbolicApproach.cpp
+        src/QmsStatisfy.cpp
+        src/QMSApproach.cpp
+)
+target_link_libraries(qmsInfer libz3)
