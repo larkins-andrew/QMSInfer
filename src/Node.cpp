@@ -4,14 +4,16 @@ using namespace std;
 Node::Node() {
 }
 Node::~Node() {
+	// TODO: Add actual destructor? Doesn't seem like delete is being called...
 	//cout << "Node Destroyed" << endl;
 }
 Node::Node(string nodeName, OperatorEnums nodeOp, NodeTypeEnums nodeType) {
 	name = nodeName;
-	distribution=DistributionEnums ::NULLDISTRIBUTION;
+	distribution = DistributionEnums::NULLDISTRIBUTION;
 	operation = nodeOp;
 	type = nodeType;
 
+	// Why are these all manually allocated???
 	dependences = new set<string>();
 	dominant = new set<string>();
 
@@ -222,7 +224,7 @@ void Node::getRandSet(Node n, set<string> &rand) {
 }
 
 bool Node::hasKey(Node n) {
-	if (n.getNodeTypeEnums() == NodeTypeEnums::SECRECT) {
+	if (n.getNodeTypeEnums() == NodeTypeEnums::SECRET) {
 		return true;
 	}
 
@@ -251,7 +253,7 @@ void Node::getRandSet2(Node n, set<string> &rand) {
 }
 
 void Node::getSecretSet(Node n, set<string> &rand) {
-	if (n.getNodeTypeEnums() == NodeTypeEnums::SECRECT) {
+	if (n.getNodeTypeEnums() == NodeTypeEnums::SECRET) {
 		rand.insert(" "+n.getName()+" ");
 	}
 	if (n.leftChild != NULL) {

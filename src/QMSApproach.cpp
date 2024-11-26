@@ -51,7 +51,7 @@ bool QMSApproach::threeConditionCheck(Node *node) {
 		else if (rightChild->getDistributionEnums() != DistributionEnums::SID) {
 			return false;
 		}
-		else if (leftChild->getNodeTypeEnums()==NodeTypeEnums::SECRECT || rightChild->getNodeTypeEnums()==NodeTypeEnums::SECRECT) {
+		else if (leftChild->getNodeTypeEnums()==NodeTypeEnums::SECRET || rightChild->getNodeTypeEnums()==NodeTypeEnums::SECRET) {
 			return false;
 		}
 		set<string> *leftSupportV = new set<string>();
@@ -117,7 +117,7 @@ void QMSApproach::smtBasedCheckQms(string benchmarkName) {
 	}
 
 	for (unsigned int i = 0; i < SecV.size(); i++) {
-		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRECT);
+		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRET);
 		nodeMap[SecV[i]] = n;
 	}
 
@@ -335,7 +335,7 @@ void QMSApproach::scinferBasedCheckQms(string absoluteBenchmarkPath) {
 	}
 
 	for (unsigned int i = 0; i < SecV.size(); i++) {
-		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRECT);
+		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRET);
 		nodeMap[SecV[i]] = n;
 	}
 
@@ -594,7 +594,7 @@ void QMSApproach::smtBasedComputerQms(string benchmarkName) {
 	}
 
 	for (unsigned int i = 0; i < SecV.size(); i++) {
-		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRECT);
+		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRET);
 		nodeMap[SecV[i]] = n;
 	}
 
@@ -842,7 +842,7 @@ void QMSApproach::scInferComputerQms(string absoluteBenchmarkPath) {
 	}
 
 	for (unsigned int i = 0; i < SecV.size(); i++) {
-		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRECT);
+		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRET);
 		nodeMap[SecV[i]] = n;
 	}
 
@@ -1124,7 +1124,7 @@ void QMSApproach::minQmsInfer (string absoluteBenchmarkPath) {
 	}
 
 	for (unsigned int i = 0; i < SecV.size(); i++) {
-		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRECT);
+		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRET);
 		nodeMap[SecV[i]] = n;
 	}
 
@@ -1385,7 +1385,7 @@ void QMSApproach::scinferCheckQms(string absoluteBenchmarkPath,double qms) {
 	}
 
 	for (unsigned int i = 0; i < SecV.size(); i++) {
-		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRECT);
+		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRET);
 		nodeMap[SecV[i]] = n;
 	}
 

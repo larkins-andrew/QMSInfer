@@ -20,7 +20,7 @@ void SemanticDistributionInference::synInference(Node* node) {
 	Node* leftChild = node->getLeftChild();
 	Node* rightChild = node->getRightChild();
 	if ( leftChild == NULL && rightChild == NULL) {
-		if ((*node).getNodeTypeEnums() == NodeTypeEnums::SECRECT || (*node).getNodeTypeEnums() == NodeTypeEnums::PLAIN) {
+		if ((*node).getNodeTypeEnums() == NodeTypeEnums::SECRET || (*node).getNodeTypeEnums() == NodeTypeEnums::PLAIN) {
 			(*node).setDistributionEnums(DistributionEnums::UKD);
 			return;
 		}

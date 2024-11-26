@@ -18,6 +18,7 @@
 #include "ScInferApproach.h"
 #include "SymbolicApproach.h"
 #include "QMSApproach.h"
+#include "HammingDistance.h"
 
 #include <z3++.h>
 
@@ -58,6 +59,7 @@ int main(int argc, char* argv[]) {
         s.append("   -scInferQms     use scInfer-based approach to compute the qms of test benchmark\n");
         s.append("   -minQms         use scInfer-based approach to compute the min qms of test benchmark\n");
         s.append("   -qmsCheck qms   use scInfer-based approach to check whether test benchmark satisfy the qms value\n");
+        s.append("   -crayonEater    break the mold with our groundbreaking new groundbreaking approach");
         cout<<s<<endl;
     }else if(s1.compare("-smt")==0){
         SMTApproach::incrementalApproach(s2);
@@ -73,6 +75,9 @@ int main(int argc, char* argv[]) {
         QMSApproach::minQmsInfer(s2);
     }else if(s1.compare("-qmsCheck")==0){
         QMSApproach::scinferCheckQms(s2,atof(p3));
+    } else if(s1.compare("-crayonEater")==0){
+        HammingDistance test(s2);
+        test.outputResults();
     }
 
     clock_t end_time = clock();

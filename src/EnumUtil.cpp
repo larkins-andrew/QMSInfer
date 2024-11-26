@@ -58,8 +58,8 @@ string EnumUtil::typeToString(NodeTypeEnums t) {
 	else if (t == NodeTypeEnums::MASK) {
 		return "MASK";
 	}
-	else if (t == NodeTypeEnums::SECRECT) {
-		return "SECRECT";
+	else if (t == NodeTypeEnums::SECRET) {
+		return "SECRET";
 	}
 	else if (t == NodeTypeEnums::PLAIN) {
 		return "PLAIN";

@@ -9,7 +9,7 @@ using namespace std;
 void DistributionInference::inference(Node* node, set<string> &M) {
 	//cout << node->getName() << endl;
 	if ((*node).getLeftChild() == NULL && (*node).getRightChild() == NULL) {
-		if ((*node).getNodeTypeEnums() == NodeTypeEnums::SECRECT) {
+		if ((*node).getNodeTypeEnums() == NodeTypeEnums::SECRET) {
 			(*node).setDistributionEnums(DistributionEnums::UKD);
 			(*(*node).getDependences()).insert((*node).getName());
 			return;

@@ -2,7 +2,6 @@
 #include <string>
 #include <set>
 #include <fstream>
-#include <cassert>
 #include <time.h>
 #include "Node.h"
 #include "NodeTypeEnums.h"
@@ -16,35 +15,27 @@
 #include "StringUtil.h"
 #include "NodeUtil.h"
 #include "SMT2Parse.h"
-#include "ScInferApproach.h"
+#include "HammingDistance.h"
 #include <deque>
 #include <filesystem>
 using namespace std;
 
-void ScInferApproach::scInferApproach(string absoluteBenchmarkPath) {
+HammingDistance::HammingDistance(string absPath) {
+	absoluteBenchmarkPath = absPath;
+	scInferApproach();
+}
+HammingDistance::~HammingDistance(void) {
+	return;
+}
+
+void HammingDistance::scInferApproach() {
 	clock_t start_time = clock();
 	
-	vector<string> RandV;
-	vector<string> SecV;
-	vector<string> PublicV;
-	vector<string> InterV;
-	vector<string> CodeV;
-
-	vector<Node> RandNodeVector;
-	vector<Node> SecNodeVector;
-	vector<Node> PublicNodeVector;
-	vector<Node> InterNodeVector;
-	vector<Node> ConstantNodeVector;
-
-
-	map<string, Node> nodeMap;
-
 	string RandFile = absoluteBenchmarkPath + "/inRandList.txt";
 	string SecFile = absoluteBenchmarkPath + "/inSecList.txt";
 	string PublicFile = absoluteBenchmarkPath + "/inPubList.txt";
 	string CodeFile = absoluteBenchmarkPath + "/code.cpp";
 
-	ifstream infile;
 	FileUtil::readFileToNodeVector(RandFile, RandV);
 	FileUtil::readFileToNodeVector(SecFile, SecV);
 	FileUtil::readFileToNodeVector(PublicFile, PublicV);
@@ -73,28 +64,20 @@ void ScInferApproach::scInferApproach(string absoluteBenchmarkPath) {
 	nodeMap["0"] = f;
 
 
-	vector<string> v;
-	int rudCount = 0;
-	int sidCount = 0;
-	int cstCount = 0;
-	int ukdCount = 0;
-	int nullCount = 0;
-	int npmCount = 0;
-	int nodeSmtCheckCount = 0;
-	int ukdBySemdR = 0;
-	int ukdToNpm = 0;
-	int ukdToSid = 0;
+	rudCount = 0;
+	sidCount = 0;
+	cstCount = 0;
+	ukdCount = 0;
+	nullCount = 0;
+	npmCount = 0;
+	nodeSmtCheckCount = 0;
+	ukdBySemdR = 0;
+	ukdToNpm = 0;
+	ukdToSid = 0;
 
-	double time1=0.0;
-	double time2=0.0;
-	double time3=0.0;
-
-	ofstream fout;
-	filesystem::path output_path = absoluteBenchmarkPath + "/scInfer_result/scInferResult.txt";
-	if (!filesystem::is_directory(output_path.parent_path())) {
-		filesystem::create_directory(output_path.parent_path());
-	}
-	fout.open(output_path);
+	time1=0.0;
+	time2=0.0;
+	time3=0.0;
 
 	cout<<"start, hold on..."<<endl;
 	for (unsigned int i = 0; i < CodeV.size(); i++) {
@@ -102,97 +85,16 @@ void ScInferApproach::scInferApproach(string absoluteBenchmarkPath) {
 		str.erase(std::remove(str.begin(), str.end(), ';'), str.end());
 		StringUtil::trim(str);
 
-		string temp[3];
-		vector<string> v1;
-		vector<string> v2;
-
 		//add inter node one by one to nodeMap
-		v.clear();
+		vector<string> v;
 		StringUtil::SplitString(str, v, "=");
+		// Until multiline support is added
+		assert(v.size() == 2);
 		InterV.push_back(v[0]);
 		Node n = Node(v[0], OperatorEnums::NULLOPERATOR, NodeTypeEnums::INTERMEDIATE);
 		nodeMap[InterV[i]] = n;
 
-
-		if (str.find("^") != -1) {
-			v1.clear();
-			v2.clear();
-			StringUtil::SplitString(str, v1, "=");
-			temp[0] = v1[0];
-			StringUtil::SplitString(v1[1], v2, "^");
-			temp[1] = v2[0];
-			temp[2] = v2[1];
-
-			nodeMap[temp[0]].setLeftChild(&nodeMap[temp[1]]);
-			nodeMap[temp[0]].setRightChild(&nodeMap[temp[2]]);
-			nodeMap[temp[0]].setOperatorEnums(OperatorEnums::XOR);
-
-			nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
-			nodeMap[temp[2]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
-
-		} else if (str.find("&") != -1) {
-			v1.clear();
-			v2.clear();
-			StringUtil::SplitString(str, v1, "=");
-
-			temp[0] = v1[0];
-			StringUtil::SplitString(v1[1], v2, "&");
-			temp[1] = v2[0];
-			temp[2] = v2[1];
-
-			nodeMap[temp[0]].setLeftChild(&nodeMap[temp[1]]);
-			nodeMap[temp[0]].setRightChild(&nodeMap[temp[2]]);
-			nodeMap[temp[0]].setOperatorEnums(OperatorEnums::AND);
-
-			nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
-			nodeMap[temp[2]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
-
-		} else if (str.find("|") != -1) {
-			v1.clear();
-			v2.clear();
-			StringUtil::SplitString(str, v1, "=");
-			temp[0] = v1[0];
-			StringUtil::SplitString(v1[1], v2, "|");
-			temp[1] = v2[0];
-			temp[2] = v2[1];
-
-			nodeMap[temp[0]].setLeftChild(&nodeMap[temp[1]]);
-			nodeMap[temp[0]].setRightChild(&nodeMap[temp[2]]);
-			nodeMap[temp[0]].setOperatorEnums(OperatorEnums::OR);
-
-			nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
-			nodeMap[temp[2]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
-
-		} else if (str.find("~") != -1) {
-			v1.clear();
-			v2.clear();
-			StringUtil::SplitString(str, v1, "=");
-			temp[0] = v1[0];
-			str = v1[1];
-			str.erase(std::remove(str.begin(), str.end(), '~'), str.end());
-			temp[1] = str;
-
-			nodeMap[temp[0]].setLeftChild(&nodeMap[temp[1]]);
-			nodeMap[temp[0]].setRightChild(NULL);
-			nodeMap[temp[0]].setOperatorEnums(OperatorEnums::NOT);
-			nodeMap[temp[0]].setDistributionEnums(nodeMap[temp[1]].getDistributionEnums());
-
-			nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
-		} else {
-			v1.clear();
-			v2.clear();
-			StringUtil::SplitString(str, v1, "=");
-			temp[0] = v1[0];
-			temp[1] = v1[1];
-
-			nodeMap[temp[0]].setLeftChild(&nodeMap[temp[1]]);
-			nodeMap[temp[0]].setRightChild(NULL);
-			nodeMap[temp[0]].setOperatorEnums(OperatorEnums::EQUAL);
-			nodeMap[temp[0]].setDistributionEnums(nodeMap[temp[1]].getDistributionEnums());
-
-			nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
-		}
-
+		add_node(str);
 
 		NodeUtil::getAuxiliaryTable(&nodeMap[InterV[i]]);
 
@@ -240,9 +142,9 @@ void ScInferApproach::scInferApproach(string absoluteBenchmarkPath) {
 				else if(dis == DistributionEnums::SID)
 					ukdToSid++;
 
-				time1=time1+(t2-t1);
-				time2=time2+(t4-t3);
-				time3=time3+(t6-t5);
+				time1 += t2-t1;
+				time2 += t4-t3;
+				time3 += t6-t5;
 			} else {
 				nodeMap[InterV[i]].setDistributionEnums(tempNode.getDistributionEnums());
 			}
@@ -268,19 +170,28 @@ void ScInferApproach::scInferApproach(string absoluteBenchmarkPath) {
 			nullCount = nullCount + 1;
 			break;
 		}
-
-		string s = "";
-		s = "Node: " + InterV[i] + " , Distribution: " + EnumUtil::distributionToString(nodeMap[InterV[i]].getDistributionEnums());
-	
-		fout << s << "\n";
 	}
-
 
 	clock_t end_time = clock();
 	//cout << "Running time is: " << static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC * 1000 << "ms" << endl;
-	double timeCount = static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC * 1000;
+	timeCount = static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC * 1000;
 	//cout << timeCount << endl;
+}
+
+void HammingDistance::outputResults() {
+	ofstream fout;
+	filesystem::path output_path = absoluteBenchmarkPath + "/hammingDistance_result/scInferResult.txt";
+	if (!filesystem::is_directory(output_path.parent_path())) {
+		filesystem::create_directory(output_path.parent_path());
+	}
+	fout.open(output_path);
+
+
 	string s = "";
+	for (unsigned int i = 0; i < InterV.size(); i++) {
+		s = "Node: " + InterV[i] + " , Distribution: " + EnumUtil::distributionToString(nodeMap[InterV[i]].getDistributionEnums());
+		fout << s << "\n";
+	}
 	s = "All node count is: " + StringUtil::getString(InterV.size());
 	fout << s << "\n";
 	s = "Node SMT check count: " + StringUtil::getString(nodeSmtCheckCount);
@@ -325,4 +236,79 @@ void ScInferApproach::scInferApproach(string absoluteBenchmarkPath) {
 	fout << s << "\n";
 	fout << flush;
 	fout.close();
+}
+
+void HammingDistance::add_node(string &str) {
+	string temp[3];
+	vector<string> v1;
+	vector<string> v2;
+
+	if (str.find("^") != -1) {
+		StringUtil::SplitString(str, v1, "=");
+		temp[0] = v1[0];
+		StringUtil::SplitString(v1[1], v2, "^");
+		temp[1] = v2[0];
+		temp[2] = v2[1];
+
+		nodeMap[temp[0]].setLeftChild(&nodeMap[temp[1]]);
+		nodeMap[temp[0]].setRightChild(&nodeMap[temp[2]]);
+		nodeMap[temp[0]].setOperatorEnums(OperatorEnums::XOR);
+
+		nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
+		nodeMap[temp[2]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
+
+	} else if (str.find("&") != -1) {
+		StringUtil::SplitString(str, v1, "=");
+
+		temp[0] = v1[0];
+		StringUtil::SplitString(v1[1], v2, "&");
+		temp[1] = v2[0];
+		temp[2] = v2[1];
+
+		nodeMap[temp[0]].setLeftChild(&nodeMap[temp[1]]);
+		nodeMap[temp[0]].setRightChild(&nodeMap[temp[2]]);
+		nodeMap[temp[0]].setOperatorEnums(OperatorEnums::AND);
+
+		nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
+		nodeMap[temp[2]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
+
+	} else if (str.find("|") != -1) {
+		StringUtil::SplitString(str, v1, "=");
+		temp[0] = v1[0];
+		StringUtil::SplitString(v1[1], v2, "|");
+		temp[1] = v2[0];
+		temp[2] = v2[1];
+
+		nodeMap[temp[0]].setLeftChild(&nodeMap[temp[1]]);
+		nodeMap[temp[0]].setRightChild(&nodeMap[temp[2]]);
+		nodeMap[temp[0]].setOperatorEnums(OperatorEnums::OR);
+
+		nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
+		nodeMap[temp[2]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
+
+	} else if (str.find("~") != -1) {
+		StringUtil::SplitString(str, v1, "=");
+		temp[0] = v1[0];
+		str = v1[1];
+		str.erase(std::remove(str.begin(), str.end(), '~'), str.end());
+		temp[1] = str;
+
+		nodeMap[temp[0]].setLeftChild(&nodeMap[temp[1]]);
+		nodeMap[temp[0]].setRightChild(NULL);
+		nodeMap[temp[0]].setOperatorEnums(OperatorEnums::NOT);
+		nodeMap[temp[0]].setDistributionEnums(nodeMap[temp[1]].getDistributionEnums());
+
+		nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
+	} else {
+		StringUtil::SplitString(str, v1, "=");
+		temp[0] = v1[0];
+		temp[1] = v1[1];
+
+		nodeMap[temp[0]].setLeftChild(&nodeMap[temp[1]]);
+		nodeMap[temp[0]].setRightChild(NULL);
+		nodeMap[temp[0]].setOperatorEnums(OperatorEnums::EQUAL);
+		nodeMap[temp[0]].setDistributionEnums(nodeMap[temp[1]].getDistributionEnums());
+
+		nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
+	}
 }

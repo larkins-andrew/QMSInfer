@@ -58,7 +58,7 @@ void SymbolicApproach::symbolicApproach(string benchmarkName) {
 
 
 	for (unsigned int i = 0; i < SecV.size(); i++) {
-		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRECT);
+		Node n = Node(SecV[i], OperatorEnums::NULLOPERATOR, NodeTypeEnums::SECRET);
 		nodeMap[SecV[i]] = n;
 	}
 

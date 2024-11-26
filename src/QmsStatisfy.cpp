@@ -36,7 +36,7 @@ string QmsStatisfy::getFirstString(Node n) {
 
 string QmsStatisfy::parseNode(Node n) {
 	string s = getFirstString(n);
-	if (n.getNodeTypeEnums() == NodeTypeEnums::MASK || n.getNodeTypeEnums() == NodeTypeEnums::SECRECT || n.getNodeTypeEnums()==NodeTypeEnums::PLAIN || n.getNodeTypeEnums()==NodeTypeEnums::CONSTANT) {
+	if (n.getNodeTypeEnums() == NodeTypeEnums::MASK || n.getNodeTypeEnums() == NodeTypeEnums::SECRET || n.getNodeTypeEnums()==NodeTypeEnums::PLAIN || n.getNodeTypeEnums()==NodeTypeEnums::CONSTANT) {
 		return n.getName();
 	}
 	if (n.getLeftChild() != NULL) {

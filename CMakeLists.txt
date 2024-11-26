@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.22)
 include(FetchContent)
 project(qmsInfer)
 
@@ -8,7 +8,7 @@ FetchContent_Declare(z3
 )
 FetchContent_MakeAvailable(z3)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall " )
 
 include_directories(${qmsInfer_SOURCE_DIR}/include)
@@ -29,5 +29,6 @@ add_executable(qmsInfer
         src/SymbolicApproach.cpp
         src/QmsStatisfy.cpp
         src/QMSApproach.cpp
+        src/HammingDistance.cpp
 )
 target_link_libraries(qmsInfer libz3)

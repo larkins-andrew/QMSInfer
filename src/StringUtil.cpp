@@ -22,7 +22,7 @@ void StringUtil::trim(string &s)
 
 }
 
-void StringUtil::SplitString(const std::string& s, std::vector<std::string>& v, const std::string& c)
+void StringUtil::SplitString(const std::string &s, std::vector<std::string> &v, const std::string &c)
 {
 	std::string::size_type pos1, pos2;
 	pos2 = s.find(c);
@@ -34,6 +34,7 @@ void StringUtil::SplitString(const std::string& s, std::vector<std::string>& v, 
 		pos1 = pos2 + c.size();
 		pos2 = s.find(c, pos1);
 	}
+	// Add final segment
 	if (pos1 != s.length())
 		v.push_back(s.substr(pos1));
 }
