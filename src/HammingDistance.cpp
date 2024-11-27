@@ -21,6 +21,7 @@
 using namespace std;
 
 HammingDistance::HammingDistance(string absPath) {
+	cout << absPath << endl;
 	absoluteBenchmarkPath = absPath;
 	scInferApproach();
 }
@@ -179,6 +180,7 @@ void HammingDistance::scInferApproach() {
 }
 
 void HammingDistance::outputResults() {
+	
 	ofstream fout;
 	filesystem::path output_path = absoluteBenchmarkPath + "/hammingDistance_result/scInferResult.txt";
 	if (!filesystem::is_directory(output_path.parent_path())) {
@@ -311,4 +313,6 @@ void HammingDistance::add_node(string &str) {
 
 		nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
 	}
+	// nodeMap[temp[0]]::printTreeAtNode
+	node::printTreeAtNode(nodeMap[temp[0]]);
 }

@@ -9,7 +9,7 @@ FetchContent_Declare(z3
 FetchContent_MakeAvailable(z3)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall " )
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall")
 
 include_directories(${qmsInfer_SOURCE_DIR}/include)
 include_directories(${z3_SOURCE_DIR}/src/api/c++ )

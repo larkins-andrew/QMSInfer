@@ -42,7 +42,7 @@ void DistributionInference::inference(Node* node, set<string> &M) {
 		ruleInference(node, (*node).getOperatorEnums(), M);
 	}
 }
-	
+
 
 void DistributionInference::ruleInference(Node *n, OperatorEnums op, set<string> &M) {
 	if (n->getLeftChild()!=NULL && n->getRightChild()!=NULL) {
