@@ -29,6 +29,90 @@ HammingDistance::~HammingDistance(void) {
 	return;
 }
 
+void HammingDistance::evalNode(std::string n){
+
+	NodeUtil::getAuxiliaryTable(&nodeMap[n]);
+
+	SemanticDistributionInference::synInference(&nodeMap[n]);
+
+	if(nodeMap[n].getDistributionEnums()==DistributionEnums::UKD){
+		ukdBySemdR += 1;
+		Node tempNode;
+		NodeUtil::nodeCopy(&tempNode, nodeMap[n]);
+
+
+		if(nodeMap[n].getUniqueM()->size()>0){
+			NodeUtil::getRegion(&tempNode, nodeMap[n].getUniqueM(), nodeMap);
+		}
+
+		clock_t t1 = clock();
+		SemanticDistributionInference::semRule(&tempNode, &nodeMap[n]);
+		clock_t t2 = clock();
+
+		if(tempNode.getDistributionEnums()==DistributionEnums::UKD){
+
+			clock_t t3 = clock();
+
+
+			set<string> * notCareRandSet=new set<string>();
+			set<string> * randSet = new set<string>();
+			set<string> * semdSet = new set<string>();
+			NodeUtil::getNotCareRandomSet(tempNode,*notCareRandSet);
+			Node::getRandSet(tempNode, *randSet);
+			SetUtil::Difference(*randSet, *notCareRandSet, *semdSet);
+			tempNode.setSemd(semdSet);
+			nodeMap[n].setSemd(semdSet);
+
+			clock_t t4 = clock();
+
+
+			nodeSmtCheckCount = nodeSmtCheckCount + 1;
+			DistributionEnums dis;
+			clock_t t5 = clock();
+			dis=SMT2Parse::getDistributionByZ3(tempNode,*notCareRandSet);
+			clock_t t6 = clock();
+			nodeMap[n].setDistributionEnums(dis);
+			// if(dis == DistributionEnums::NPM)
+			// 	ukdToNpm++;
+			// else if(dis == DistributionEnums::SID)
+			// 	ukdToSid++;
+
+			// time1 += t2-t1;
+			// time2 += t4-t3;
+			// time3 += t6-t5;
+		} else {
+			nodeMap[n].setDistributionEnums(tempNode.getDistributionEnums());
+		}
+	}
+}
+
+void HammingDistance::distAnalysis(){
+	filesystem::path output_path = absoluteBenchmarkPath + "/hammingDistance_result/hammingDistanceResult.txt";
+	ofstream fout;
+
+	if (!filesystem::is_directory(output_path.parent_path())) {
+		filesystem::create_directory(output_path.parent_path());
+	}
+	fout.open(output_path);
+
+	std::string tempNode = "dummyXor";
+	Node n = Node(tempNode, OperatorEnums::XOR, NodeTypeEnums::INTERMEDIATE);
+	for (unsigned int i = 0; i < InterV.size() - 1; i++) {
+		for (unsigned int j = i + 1; j < InterV.size(); j++) {
+			Node n = Node(tempNode, OperatorEnums::XOR, NodeTypeEnums::INTERMEDIATE);
+			nodeMap[tempNode] = n;
+			nodeMap[tempNode].setLeftChild(&nodeMap[InterV[i]]);
+			nodeMap[tempNode].setRightChild(&nodeMap[InterV[j]]);
+			HammingDistance::evalNode(tempNode);
+
+			fout << "DistAnalysis: " << InterV[j] << "=>" << InterV[i] << ": " << EnumUtil::distributionToString(nodeMap[tempNode].getDistributionEnums()) << "\n";
+		}
+	}	
+
+	fout << flush;
+	fout.close();
+}
+
 void HammingDistance::scInferApproach() {
 	clock_t start_time = clock();
 	
@@ -41,6 +125,9 @@ void HammingDistance::scInferApproach() {
 	FileUtil::readFileToNodeVector(SecFile, SecV);
 	FileUtil::readFileToNodeVector(PublicFile, PublicV);
 	FileUtil::readFileToCodeVector(CodeFile, CodeV);
+
+	// for (std::string i: CodeV)
+	// 	cout << i << endl;
 
 
 	for (unsigned int i = 0; i < RandV.size(); i++) {
@@ -92,6 +179,7 @@ void HammingDistance::scInferApproach() {
 		// Until multiline support is added
 		assert(v.size() == 2);
 		InterV.push_back(v[0]);
+
 		Node n = Node(v[0], OperatorEnums::NULLOPERATOR, NodeTypeEnums::INTERMEDIATE);
 		nodeMap[InterV[i]] = n;
 
@@ -180,7 +268,7 @@ void HammingDistance::scInferApproach() {
 }
 
 void HammingDistance::outputResults() {
-	
+	HammingDistance::distAnalysis();
 	ofstream fout;
 	filesystem::path output_path = absoluteBenchmarkPath + "/hammingDistance_result/scInferResult.txt";
 	if (!filesystem::is_directory(output_path.parent_path())) {
@@ -244,6 +332,9 @@ void HammingDistance::add_node(string &str) {
 	string temp[3];
 	vector<string> v1;
 	vector<string> v2;
+
+	// Node n = Node(v[0], OperatorEnums::NULLOPERATOR, NodeTypeEnums::INTERMEDIATE);
+	// nodeMap[InterV[i]] = n;
 
 	if (str.find("^") != -1) {
 		StringUtil::SplitString(str, v1, "=");
@@ -314,5 +405,5 @@ void HammingDistance::add_node(string &str) {
 		nodeMap[temp[1]].getParentNodeNames()->insert(nodeMap[temp[0]].getName());
 	}
 	// nodeMap[temp[0]]::printTreeAtNode
-	node::printTreeAtNode(nodeMap[temp[0]]);
+	// NodeUtil::printTree(&nodeMap[temp[0]], 0);
 }

@@ -42,6 +42,9 @@ int main(int argc, char* argv[]) {
         p2 = argv[2];
         s2=p2;
     }
+    else {
+        s2 = "TestBenchmark/example";
+    } //for ease of testing, TODO: remove later?
     if(argv[3]!=NULL){
         p3 = argv[3];
         s3=p3;
@@ -59,7 +62,8 @@ int main(int argc, char* argv[]) {
         s.append("   -scInferQms     use scInfer-based approach to compute the qms of test benchmark\n");
         s.append("   -minQms         use scInfer-based approach to compute the min qms of test benchmark\n");
         s.append("   -qmsCheck qms   use scInfer-based approach to check whether test benchmark satisfy the qms value\n");
-        s.append("   -crayonEater    break the mold with our groundbreaking new groundbreaking approach");
+        s.append("   -ce    break the mold with our groundbreaking new groundbreaking approach");
+        //TODO: rename later
         cout<<s<<endl;
     }else if(s1.compare("-smt")==0){
         SMTApproach::incrementalApproach(s2);
@@ -75,7 +79,8 @@ int main(int argc, char* argv[]) {
         QMSApproach::minQmsInfer(s2);
     }else if(s1.compare("-qmsCheck")==0){
         QMSApproach::scinferCheckQms(s2,atof(p3));
-    } else if(s1.compare("-crayonEater")==0){
+    } else if(s1.compare("-ce")==0){
+        //TODO: rename later
         HammingDistance test(s2);
         test.outputResults();
     }

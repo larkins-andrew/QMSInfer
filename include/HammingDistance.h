@@ -13,6 +13,7 @@ private:
 	std::vector<std::string> PublicV;
 	std::vector<std::string> InterV;
 	std::vector<std::string> CodeV;
+	std::vector<std::string> DistLeakV; // TODO: rename?
 	int rudCount;
 	int sidCount;
 	int cstCount;
@@ -29,6 +30,8 @@ private:
 	double timeCount;
 
 	void add_node(std::string &str);
+	void distAnalysis();
+	void evalNode(std::string n);
 public:
 	HammingDistance(std::string absPath);
 	~HammingDistance();
