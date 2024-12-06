@@ -40,19 +40,17 @@ void HammingDistance::evalNode(std::string n){
 		Node tempNode;
 		NodeUtil::nodeCopy(&tempNode, nodeMap[n]);
 
-
 		if(nodeMap[n].getUniqueM()->size()>0){
 			NodeUtil::getRegion(&tempNode, nodeMap[n].getUniqueM(), nodeMap);
 		}
 
-		clock_t t1 = clock();
+		// clock_t t1 = clock();
 		SemanticDistributionInference::semRule(&tempNode, &nodeMap[n]);
-		clock_t t2 = clock();
+		// clock_t t2 = clock();
 
 		if(tempNode.getDistributionEnums()==DistributionEnums::UKD){
 
-			clock_t t3 = clock();
-
+			// clock_t t3 = clock();
 
 			set<string> * notCareRandSet=new set<string>();
 			set<string> * randSet = new set<string>();
@@ -64,7 +62,6 @@ void HammingDistance::evalNode(std::string n){
 			nodeMap[n].setSemd(semdSet);
 
 			clock_t t4 = clock();
-
 
 			nodeSmtCheckCount = nodeSmtCheckCount + 1;
 			DistributionEnums dis;

@@ -1,4 +1,3 @@
-//Example 2 in Provably
 
 bool compute( bool k1, bool k2, bool r1, bool r2, bool r3){
 

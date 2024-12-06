@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
         s.append("   -scInferQms     use scInfer-based approach to compute the qms of test benchmark\n");
         s.append("   -minQms         use scInfer-based approach to compute the min qms of test benchmark\n");
         s.append("   -qmsCheck qms   use scInfer-based approach to check whether test benchmark satisfy the qms value\n");
-        s.append("   -ce    break the mold with our groundbreaking new groundbreaking approach");
+        s.append("   -hamDist        break the mold with our groundbreaking new groundbreaking approach\n");
         //TODO: rename later
         cout<<s<<endl;
     }else if(s1.compare("-smt")==0){
@@ -79,10 +79,13 @@ int main(int argc, char* argv[]) {
         QMSApproach::minQmsInfer(s2);
     }else if(s1.compare("-qmsCheck")==0){
         QMSApproach::scinferCheckQms(s2,atof(p3));
-    } else if(s1.compare("-ce")==0){
+    } else if(s1.compare("-hamDist")==0){
         //TODO: rename later
         HammingDistance test(s2);
         test.outputResults();
+    }
+    else {
+        cout << "Err: invalid or missing option" << endl;
     }
 
     clock_t end_time = clock();
