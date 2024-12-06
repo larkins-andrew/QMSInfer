@@ -18,6 +18,7 @@
 #include "HammingDistance.h"
 #include <deque>
 #include <filesystem>
+#include <cmath>
 using namespace std;
 
 HammingDistance::HammingDistance(string absPath) {
@@ -77,6 +78,9 @@ void HammingDistance::evalNode(std::string n){
 			// time1 += t2-t1;
 			// time2 += t4-t3;
 			// time3 += t6-t5;
+			delete notCareRandSet;
+			delete randSet;
+			delete semdSet;
 		} else {
 			nodeMap[n].setDistributionEnums(tempNode.getDistributionEnums());
 		}
@@ -93,18 +97,27 @@ void HammingDistance::distAnalysis(){
 	fout.open(output_path);
 
 	std::string tempNode = "dummyXor";
-	Node n = Node(tempNode, OperatorEnums::XOR, NodeTypeEnums::INTERMEDIATE);
+	Node n;
+	int k = 0;
+	cout<<"starting distAnalysis, hold on..."<<endl;
+	cout << "InterV Size: " << InterV.size() << endl;
 	for (unsigned int i = 0; i < InterV.size() - 1; i++) {
+		if (k != (i / InterV.size()) * 100){
+			k = (i / InterV.size()) * 100;
+			cout << round((i / InterV.size()) * 100) << endl;
+		}
 		for (unsigned int j = i + 1; j < InterV.size(); j++) {
 			Node n = Node(tempNode, OperatorEnums::XOR, NodeTypeEnums::INTERMEDIATE);
 			nodeMap[tempNode] = n;
 			nodeMap[tempNode].setLeftChild(&nodeMap[InterV[i]]);
 			nodeMap[tempNode].setRightChild(&nodeMap[InterV[j]]);
 			HammingDistance::evalNode(tempNode);
-
-			fout << "DistAnalysis: " << InterV[j] << "=>" << InterV[i] << ": " << EnumUtil::distributionToString(nodeMap[tempNode].getDistributionEnums()) << "\n";
+			if (EnumUtil::distributionToString(nodeMap[tempNode].getDistributionEnums()).compare("NPM")==0){
+				fout << "DistAnalysis: " << InterV[j] << "=>" << InterV[i] << ": " << EnumUtil::distributionToString(nodeMap[tempNode].getDistributionEnums()) << "\n";
+			}
+			// ~n();
 		}
-	}	
+	}
 
 	fout << flush;
 	fout.close();

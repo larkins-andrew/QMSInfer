@@ -5,10 +5,20 @@ Node::Node() {
 }
 Node::~Node() {
 	// TODO: Add actual destructor? Doesn't seem like delete is being called...
-	//cout << "Node Destroyed" << endl;
+	// cout << "Node Destroyed " << name << endl;
+	// delete dependences;
+	// delete dominant;
+
+	// delete supportV;
+	// delete uniqueM;
+	// delete perfectM;
+
+	// delete parentNodeNames;
+
 }
 Node::Node(string nodeName, OperatorEnums nodeOp, NodeTypeEnums nodeType) {
 	name = nodeName;
+	// cout << "Node Created " << name << endl;
 	distribution = DistributionEnums::NULLDISTRIBUTION;
 	operation = nodeOp;
 	type = nodeType;
